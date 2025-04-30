@@ -36,7 +36,62 @@ class Program
                     SaveTransactionsToFile(transactions, "Transactions.json");
                     break;
                 case 2:
-                    Show(transactions);
+                    Console.Write("Do you want to use filtering? [1] - YES [0] - NO: ");
+                    string filter = Console.ReadLine();
+
+                    if (!int.TryParse(filter, out int isFiltered))
+                    {
+                        Console.WriteLine("You didn't specify a number!");
+                        continue;
+                    }
+
+                    switch(isFiltered)
+                    {
+                        case 0:
+                            Show(transactions);
+                            break;
+                        case 1:
+                            Console.WriteLine("---FILTER---");
+                            Console.WriteLine("[1] - Filter by Date");
+                            Console.WriteLine("[2] - Filter by Category");
+
+                            Console.Write("Select a filter: ");
+                            string whichFilter = Console.ReadLine();
+
+                            if (!int.TryParse(whichFilter, out int selectedFilter))
+                            {
+                                Console.WriteLine("You didn't specify a number!");
+                                continue;
+                            }
+
+                            if(selectedFilter == 1)
+                            {
+                                var transactionsOrderedByDate = transactions.OrderBy(t => t.Date).ToList();
+                                Show(transactionsOrderedByDate);
+                            }
+                            else if(selectedFilter == 2)
+                            {
+                                var transactionsGroupedByCategory = transactions.GroupBy(t => t.Category).ToList();
+
+                                foreach (var group in transactionsGroupedByCategory)
+                                {
+                                    Console.WriteLine($"Category: {group.Key}");
+                                    foreach (var transaction in group)
+                                    {
+                                        Console.WriteLine($"  Amount: {transaction.Amount}, Description: {transaction.Description}, Date: {transaction.Date}");
+                                    }
+                                    Console.WriteLine("-------------------");
+                                }
+                            }
+                            else 
+                            {
+                                Console.WriteLine("That action does not exist!");
+                            }
+                            break;
+                        default:
+                            Console.WriteLine("Enter a good number!");
+                            continue;
+                    }
                     break;
                 case 5:
                     Console.WriteLine("Exiting...");
@@ -102,4 +157,5 @@ class Program
         string json = File.ReadAllText(filePath);
         return JsonSerializer.Deserialize<List<Transaction>>(json) ?? new List<Transaction>();
     }
+    
 }
