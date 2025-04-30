@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using BudgetCLI.Models;
 
 class Program
@@ -7,11 +8,11 @@ class Program
     {
         List<Transaction> transactions = new List<Transaction>();
         
+        transactions = LoadTransactionsFromFile("Transactions.json");
+        
         bool isRunning = true;
         while(isRunning)
-        {
-            Console.Clear();
-            
+        {  
             Console.WriteLine("---BudgetCLI---");
             Console.WriteLine("[1] - Add Transaction");
             Console.WriteLine("[2] - Show Transactions");
@@ -21,13 +22,10 @@ class Program
             Console.Write("Select action: ");
             string input = Console.ReadLine();
 
-            if(int.TryParse(input, out int selectedAction))
-            {
-                continue;
-            }
-            else 
+            if (!int.TryParse(input, out int selectedAction))
             {
                 Console.WriteLine("You didn't specify a number!");
+                continue;
             }
 
             switch(selectedAction)
@@ -35,19 +33,20 @@ class Program
                 case 1:
                     AddTransaction(transactions);
                     Console.WriteLine("Transaction added.");
+                    SaveTransactionsToFile(transactions, "Transactions.json");
                     break;
                 case 2:
                     Show(transactions);
                     break;
                 case 5:
                     Console.WriteLine("Exiting...");
+                    SaveTransactionsToFile(transactions, "Transactions.json");
                     isRunning = false;
                     break;
                 default:
                     Console.WriteLine("That action does not exist!");
                     break;
             }
-            
         }
     }
     public static void AddTransaction(List<Transaction> transactions)
@@ -68,6 +67,8 @@ class Program
 
         Transaction transaction = new Transaction(amount, category, desc, date);
         transactions.Add(transaction);
+
+        
     }
     public static void Show(List<Transaction> transactions)
     {
@@ -80,5 +81,25 @@ class Program
             Console.WriteLine($"Date: {transaction.Date}");
             Console.WriteLine("-------------------");
         }
+    }
+
+    public static void SaveTransactionsToFile(List<Transaction> transactions, string filePath)
+    {
+        string json = JsonSerializer.Serialize(transactions, new JsonSerializerOptions { WriteIndented = true });
+
+        File.WriteAllText(filePath, json);
+        Console.WriteLine($"Transactions saved to {filePath}");
+    }
+
+    public static List<Transaction> LoadTransactionsFromFile(string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            Console.WriteLine($"File {filePath} does not exist. Returning an empty list.");
+            return new List<Transaction>();
+        }
+
+        string json = File.ReadAllText(filePath);
+        return JsonSerializer.Deserialize<List<Transaction>>(json) ?? new List<Transaction>();
     }
 }
