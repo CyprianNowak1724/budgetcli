@@ -10,12 +10,25 @@ class Program
         bool isRunning = true;
         while(isRunning)
         {
+            Console.Clear();
+            
             Console.WriteLine("---BudgetCLI---");
             Console.WriteLine("[1] - Add Transaction");
             Console.WriteLine("[2] - Show Transactions");
+            Console.WriteLine("[5] - Exit");
+            Console.WriteLine("-----------------");
 
             Console.Write("Select action: ");
-            int selectedAction = int.Parse(Console.ReadLine());
+            string input = Console.ReadLine();
+
+            if(int.TryParse(input, out int selectedAction))
+            {
+                continue;
+            }
+            else 
+            {
+                Console.WriteLine("You didn't specify a number!");
+            }
 
             switch(selectedAction)
             {
@@ -26,7 +39,15 @@ class Program
                 case 2:
                     Show(transactions);
                     break;
+                case 5:
+                    Console.WriteLine("Exiting...");
+                    isRunning = false;
+                    break;
+                default:
+                    Console.WriteLine("That action does not exist!");
+                    break;
             }
+            
         }
     }
     public static void AddTransaction(List<Transaction> transactions)
