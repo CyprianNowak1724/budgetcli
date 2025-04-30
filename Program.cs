@@ -11,12 +11,17 @@ class Program
         transactions = LoadTransactionsFromFile("Transactions.json");
         
         bool isRunning = true;
+
+        int earning = 0;
+
         while(isRunning)
         {  
+            Console.Clear();
             Console.WriteLine("---BudgetCLI---");
             Console.WriteLine("[1] - Add Transaction");
             Console.WriteLine("[2] - Show Transactions");
-            Console.WriteLine("[5] - Exit");
+            Console.WriteLine("[3] - How much did you earn?");
+            Console.WriteLine("[4] - Exit");
             Console.WriteLine("-----------------");
 
             Console.Write("Select action: ");
@@ -25,23 +30,31 @@ class Program
             if (!int.TryParse(input, out int selectedAction))
             {
                 Console.WriteLine("You didn't specify a number!");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
                 continue;
             }
 
             switch(selectedAction)
             {
                 case 1:
-                    AddTransaction(transactions);
+                    Console.Clear();
+                    AddTransaction(transactions, ref earning);
                     Console.WriteLine("Transaction added.");
                     SaveTransactionsToFile(transactions, "Transactions.json");
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
                     break;
                 case 2:
+                    Console.Clear();
                     Console.Write("Do you want to use filtering? [1] - YES [0] - NO: ");
                     string filter = Console.ReadLine();
 
                     if (!int.TryParse(filter, out int isFiltered))
                     {
                         Console.WriteLine("You didn't specify a number!");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey();
                         continue;
                     }
 
@@ -49,6 +62,8 @@ class Program
                     {
                         case 0:
                             Show(transactions);
+                            Console.WriteLine("Press any key to continue...");
+                            Console.ReadKey();
                             break;
                         case 1:
                             Console.WriteLine("---FILTER---");
@@ -61,6 +76,8 @@ class Program
                             if (!int.TryParse(whichFilter, out int selectedFilter))
                             {
                                 Console.WriteLine("You didn't specify a number!");
+                                Console.WriteLine("Press any key to continue...");
+                                Console.ReadKey();
                                 continue;
                             }
 
@@ -68,6 +85,8 @@ class Program
                             {
                                 var transactionsOrderedByDate = transactions.OrderBy(t => t.Date).ToList();
                                 Show(transactionsOrderedByDate);
+                                Console.WriteLine("Press any key to continue...");
+                                Console.ReadKey();
                             }
                             else if(selectedFilter == 2)
                             {
@@ -82,29 +101,58 @@ class Program
                                     }
                                     Console.WriteLine("-------------------");
                                 }
+                                Console.WriteLine("Press any key to continue...");
+                                Console.ReadKey();
                             }
                             else 
                             {
                                 Console.WriteLine("That action does not exist!");
+                                Console.WriteLine("Press any key to continue...");
+                                Console.ReadKey();
                             }
                             break;
                         default:
                             Console.WriteLine("Enter a good number!");
+                            Console.WriteLine("Press any key to continue...");
+                            Console.ReadKey();
                             continue;
                     }
                     break;
-                case 5:
+                case 3:
+                    Console.Clear();
+                    Console.Write("State the amount you earned: ");
+                    string earnedAmount = Console.ReadLine();
+
+                    if (!int.TryParse(earnedAmount, out int typedAmount))
+                    {
+                        Console.WriteLine("You didn't specify an amount!");
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey();
+                        continue;
+                    }
+
+                    earning += typedAmount;
+                    Console.WriteLine($"That's your earnings: {earning}");
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
+                    break;
+                case 4:
+                    Console.Clear();
                     Console.WriteLine("Exiting...");
                     SaveTransactionsToFile(transactions, "Transactions.json");
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
                     isRunning = false;
                     break;
                 default:
                     Console.WriteLine("That action does not exist!");
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
                     break;
             }
         }
     }
-    public static void AddTransaction(List<Transaction> transactions)
+    public static void AddTransaction(List<Transaction> transactions, ref int earning)
     {
         Console.Write("Specify amount: ");
         int amount = int.Parse(Console.ReadLine());
@@ -123,7 +171,10 @@ class Program
         Transaction transaction = new Transaction(amount, category, desc, date);
         transactions.Add(transaction);
 
-        
+        earning -= transaction.Amount;
+        Console.WriteLine($"Remaining earnings: {earning}");
+        Console.WriteLine("Press any key to continue...");
+        Console.ReadKey();
     }
     public static void Show(List<Transaction> transactions)
     {
@@ -136,6 +187,8 @@ class Program
             Console.WriteLine($"Date: {transaction.Date}");
             Console.WriteLine("-------------------");
         }
+        Console.WriteLine("Press any key to continue...");
+        Console.ReadKey();
     }
 
     public static void SaveTransactionsToFile(List<Transaction> transactions, string filePath)
@@ -144,6 +197,8 @@ class Program
 
         File.WriteAllText(filePath, json);
         Console.WriteLine($"Transactions saved to {filePath}");
+        Console.WriteLine("Press any key to continue...");
+        Console.ReadKey();
     }
 
     public static List<Transaction> LoadTransactionsFromFile(string filePath)
@@ -151,6 +206,8 @@ class Program
         if (!File.Exists(filePath))
         {
             Console.WriteLine($"File {filePath} does not exist. Returning an empty list.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
             return new List<Transaction>();
         }
 
