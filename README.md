@@ -24,6 +24,6 @@
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/your-username/BudgetCLI.git
+git clone https://github.com/CyprianNowak1724/BudgetCLI.git
 cd BudgetCLI
 dotnet run
